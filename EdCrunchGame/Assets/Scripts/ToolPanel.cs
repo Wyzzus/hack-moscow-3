@@ -51,6 +51,7 @@ public class ToolPanel : MonoBehaviour
                 Divide();
                 break;
         }
+        NumbersManager.instance.CheckWin();
     }
 
     #region Operators
@@ -93,11 +94,7 @@ public class ToolPanel : MonoBehaviour
         {
             NumbersManager.instance.CurrentView.Value *= OperNumber;
             NumbersManager.instance.CurrentView.ResetValue();
-            if (OperNumber > 0)
-            {
-                NumbersManager.instance.CreateEnemyView(OperNumber);
-            }
-            else
+            if (OperNumber < 1)
             {
                 NumbersManager.instance.EnemiesViews.Remove(NumbersManager.instance.CurrentView);
                 Destroy(NumbersManager.instance.CurrentView.gameObject);
@@ -113,11 +110,17 @@ public class ToolPanel : MonoBehaviour
         {
             if(NumbersManager.instance.CurrentView.Value % OperNumber == 0)
             {
-                NumbersManager.instance.CurrentView.Value /= OperNumber;
+                if (OperNumber == 0)
+                    return;
+                int targetValue = NumbersManager.instance.CurrentView.Value /= OperNumber;
+                NumbersManager.instance.CurrentView.Value = targetValue;
                 NumbersManager.instance.CurrentView.ResetValue();
-                if (OperNumber > 0)
+                if(OperNumber > 0)
                 {
-                    NumbersManager.instance.CreateEnemyView(OperNumber);
+                    for (int i = 0; i < OperNumber-1; i++)
+                    {
+                        NumbersManager.instance.CreateEnemyView(targetValue);
+                    }
                 }
                 else
                 {
