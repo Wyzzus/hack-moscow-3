@@ -15,6 +15,7 @@ public class NumberView : MonoBehaviour
 
     public Text HP;
     public Image BackPanel;
+    public Image Icon;
     public int Value;
 
     public void Setup(int HP, ViewType type)
@@ -22,11 +23,39 @@ public class NumberView : MonoBehaviour
         this.HP.text = HP.ToString();
         this.MyType = type;
         this.Value = HP;
+        ResetValue();
     }
 
     public void ResetValue()
     {
         HP.text = Value.ToString();
+        if(MyType == ViewType.Enemy)
+        {
+            switch(Value)
+            {
+                case 1:
+                    Icon.color = Color.blue;
+                    break;
+                case 2:
+                    Icon.color = Color.cyan;
+                    break;
+                case 3:
+                    Icon.color = Color.green;
+                    break;
+                case 4:
+                    Icon.color = Color.magenta;
+                    break;
+                case 5:
+                    Icon.color = Color.red;
+                    break;
+                case 6:
+                    Icon.color = Color.yellow;
+                    break;
+                default:
+                    Icon.color = Color.white;
+                    break;
+            }
+        }
     }
 
     public void ResetBack()

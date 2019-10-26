@@ -19,6 +19,13 @@ public class NumbersManager : MonoBehaviour
         Down, Up
     }
 
+    public enum GameState
+    {
+        Win, None 
+    }
+
+    public GameState CurrentGameState = GameState.None;
+
     public Gamemode CurrentGamemode = Gamemode.Down;
 
     [Header ("Values")]
@@ -28,11 +35,15 @@ public class NumbersManager : MonoBehaviour
     public int[] StartValues;
     public int[] FinishValues;
 
+    public int Level = 0;
+
     [Header("Tools")]
     public GameObject Add;
     public GameObject Subtract;
     public GameObject Multiple;
     public GameObject Divide;
+
+    public GameObject WinScreen;
 
     [Header("Config")]
     public Color ChosenColor;
@@ -51,18 +62,11 @@ public class NumbersManager : MonoBehaviour
     public RectTransform AlliesViewsPanel;
 
     public NumberView ViewPrefab;
+    public NumberView AllyViewPrefab;
 
     public void Start()
     {
-        switch(CurrentGamemode)
-        {
-            case Gamemode.Down:
-                GenerateDown();
-                break;
-            case Gamemode.Up:
-                GenerateUp();
-                break;
-        }
+        GenerateLevel();
     }
 
     public void Update()
@@ -95,15 +99,14 @@ public class NumbersManager : MonoBehaviour
     {
         if(CurrentView != null)
         {
-            obj.SetActive(true);
+            ActDeactObj(obj);
             obj.GetComponentInChildren<ToolPanel>().Setup(CurrentView.Value);
         }
-
     }
 
     public void CreateAllyView(int value)
     {
-        NumberView aView = Instantiate<NumberView>(ViewPrefab, AlliesViewsPanel);
+        NumberView aView = Instantiate<NumberView>(AllyViewPrefab, AlliesViewsPanel);
         aView.Setup(value, NumberView.ViewType.Ally);
         AlliesViews.Add(aView);
     }
@@ -116,6 +119,19 @@ public class NumbersManager : MonoBehaviour
     }
 
     #region Down
+
+    public void GenerateLevel()
+    {
+        switch (CurrentGamemode)
+        {
+            case Gamemode.Down:
+                GenerateDown();
+                break;
+            case Gamemode.Up:
+                GenerateUp();
+                break;
+        }
+    }
 
     public void GenerateDown()
     {
@@ -130,6 +146,52 @@ public class NumbersManager : MonoBehaviour
             CreateAllyView(value);
         }
         CreateEnemyView(StartValue);
+    }
+
+    public void Restart()
+    {
+        foreach(NumberView nv in EnemiesViews)
+        {
+            Destroy(nv.gameObject);
+        }
+        EnemiesViews.Clear();
+        CreateEnemyView(StartValue);
+    }
+
+    public void CheckWin()
+    {
+        EnemiesViews.Sort(delegate (NumberView x, NumberView y)
+        {
+            return x.Value.CompareTo(y.Value);
+        });
+
+        AlliesViews.Sort(delegate (NumberView x, NumberView y)
+        {
+            return x.Value.CompareTo(y.Value);
+        });
+
+        if(AlliesViews.Count == EnemiesViews.Count)
+        {
+            int equals = 0;
+            for(int i = 0; i < AlliesViews.Count; i++)
+            {
+                Debug.Log(AlliesViews[i].Value + " | " + EnemiesViews[i].Value);
+                equals++;
+            }
+            if(equals == AlliesViews.Count)
+            {
+                CurrentGameState = GameState.Win;
+                WinGame();
+            }
+            else
+            {
+                CurrentGameState = GameState.None;
+            }
+        }
+        else
+        {
+            CurrentGameState = GameState.None;
+        }
     }
 
     public void UpdateDown()
@@ -149,4 +211,19 @@ public class NumbersManager : MonoBehaviour
     
     }
 
+    public void WinGame()
+    {
+        WinScreen.SetActive(true);
+        Level++;
+        GenerateLevel();
+    }
+
+    public void ActDeactObj(GameObject obj)
+    {
+        if (obj.activeSelf)
+            obj.SetActive(false);
+        else
+            obj.SetActive(true);
+    }
+    
 }
