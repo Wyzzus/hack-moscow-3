@@ -8,7 +8,7 @@ public class NumberView : MonoBehaviour
 {
     public enum ViewType
     {
-    Enemy, Ally 
+        Enemy, Ally 
     }
 
     public ViewType MyType;

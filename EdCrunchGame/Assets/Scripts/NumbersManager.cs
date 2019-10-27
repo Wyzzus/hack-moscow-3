@@ -122,6 +122,16 @@ public class NumbersManager : MonoBehaviour
 
     public void GenerateLevel()
     {
+        foreach(NumberView nv in EnemiesViews)
+        {
+            Destroy(nv.gameObject);
+        }
+        foreach (NumberView nv in AlliesViews)
+        {
+            Destroy(nv.gameObject);
+        }
+        EnemiesViews.Clear();
+        AlliesViews.Clear();
         switch (CurrentGamemode)
         {
             case Gamemode.Down:
@@ -175,8 +185,9 @@ public class NumbersManager : MonoBehaviour
             int equals = 0;
             for(int i = 0; i < AlliesViews.Count; i++)
             {
-                Debug.Log(AlliesViews[i].Value + " | " + EnemiesViews[i].Value);
-                equals++;
+                if(AlliesViews[i].Value == EnemiesViews[i].Value)
+                //  Debug.Log(AlliesViews[i].Value + " | " + EnemiesViews[i].Value);
+                    equals++;
             }
             if(equals == AlliesViews.Count)
             {
@@ -215,7 +226,6 @@ public class NumbersManager : MonoBehaviour
     {
         WinScreen.SetActive(true);
         Level++;
-        GenerateLevel();
     }
 
     public void ActDeactObj(GameObject obj)
